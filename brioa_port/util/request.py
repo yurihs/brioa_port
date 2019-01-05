@@ -58,4 +58,7 @@ def parse_last_modified_date(last_modified_header: Union[Header, str]) -> Option
     if last_modified_str.strip() == "":
         return None
 
-    return email.utils.parsedate_to_datetime(last_modified_str).astimezone(tz.tzlocal())
+    try:
+        return email.utils.parsedate_to_datetime(last_modified_str).astimezone(tz.tzlocal())
+    except (TypeError, ValueError, IndexError):
+        return None
