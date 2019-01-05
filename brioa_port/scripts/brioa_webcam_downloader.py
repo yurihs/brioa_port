@@ -20,7 +20,7 @@ import errno
 from docopt import docopt
 from pathlib import Path
 
-from brioa_port.webcam_image_downloader import WebcamImageDownloader
+from brioa_port.webcam_downloader import WebcamDownloader
 from brioa_port.exception import InvalidWebcamImageException
 
 
@@ -56,7 +56,7 @@ def main():
             print("Error: Unable to create output directory.")
             return
 
-    downloader = WebcamImageDownloader(
+    downloader = WebcamDownloader(
         webcam_url,
         output_dir_path
     )

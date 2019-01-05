@@ -12,7 +12,7 @@ from email.header import Header
 from brioa_port.exception import InvalidWebcamImageException
 
 
-class WebcamImageDownloader:
+class WebcamDownloader:
 
     def __init__(self, webcam_url: str, output_dir_path: Path):
         self.webcam_url = webcam_url
