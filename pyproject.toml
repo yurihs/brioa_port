@@ -13,6 +13,7 @@ docopt = "^0.6.2"
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 mypy = "^0.650.0"
+pytest-mock = "^1.10"
 
 [tool.poetry.scripts]
 brioa_webcam_downloader = "brioa_port.scripts.brioa_webcam_downloader:main"
