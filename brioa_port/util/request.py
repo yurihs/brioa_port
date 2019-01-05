@@ -10,13 +10,13 @@ from typing import Optional, Union, NamedTuple, cast
 from dateutil import tz
 
 from brioa_port.exceptions import FileHasInvalidLastModifiedDateException
-from brioa_port.util.datetime import get_unix_timestamp
+from brioa_port.util.datetime import get_unix_timestamp_from_local_datetime
 
 
 def save_latest_file_from_url(url: str, output_dir: Path) -> datetime:
     response = open_latest_file_from_url(url)
 
-    output_path = output_dir / str(get_unix_timestamp(response.last_modified_date))
+    output_path = output_dir / str(get_unix_timestamp_from_local_datetime(response.last_modified_date))
     if output_path.exists():
         raise FileExistsError()
 
