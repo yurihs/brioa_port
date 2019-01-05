@@ -1,0 +1,1 @@
+from .invalid_webcam_image_exception import InvalidWebcamImageException
