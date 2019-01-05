@@ -21,7 +21,7 @@ from docopt import docopt
 from pathlib import Path
 
 from brioa_port.webcam_downloader import WebcamDownloader
-from brioa_port.exception import InvalidWebcamImageException
+from brioa_port.exceptions import InvalidWebcamImageException
 
 
 def download(downloader):
