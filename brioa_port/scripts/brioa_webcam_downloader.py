@@ -23,12 +23,14 @@ from pathlib import Path
 from brioa_port.webcam_image_downloader import WebcamImageDownloader
 from brioa_port.exception import InvalidWebcamImageException
 
+
 def download(downloader):
     try:
         image_date = downloader.download_webcam_image()
         print(image_date)
     except InvalidWebcamImageException:
         print("Got an invalid image. Continuing.")
+
 
 def main():
     arguments = docopt(__doc__)
@@ -63,6 +65,7 @@ def main():
     while 1:
         schedule.run_pending()
         time.sleep(1)
+
 
 if __name__ == '__main__':
     main()

@@ -11,7 +11,8 @@ from email.header import Header
 
 from brioa_port.exception import InvalidWebcamImageException
 
-class WebcamImageDownloader():
+
+class WebcamImageDownloader:
 
     def __init__(self, webcam_url: str, output_dir_path: Path):
         self.webcam_url = webcam_url
@@ -36,7 +37,8 @@ class WebcamImageDownloader():
             output_path = output_dir / str(int(time.mktime(last_modified_date_local.timetuple())))
             if output_path.exists():
                 return None
-            with open(output_path, 'wb') as out_file:
+
+            with output_path.open('wb') as out_file:
                 shutil.copyfileobj(response, out_file)
         return last_modified_date_local
 
@@ -47,5 +49,5 @@ class WebcamImageDownloader():
                 return str(last_modified_date)
             else:
                 raise InvalidWebcamImageException()
-        except Exception as e:
+        except Exception:
             raise InvalidWebcamImageException()

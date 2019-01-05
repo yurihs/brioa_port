@@ -1,3 +1,3 @@
 class InvalidWebcamImageException(Exception):
-	def __init__(self) -> None:
-		super()
+    def __init__(self) -> None:
+        super()
