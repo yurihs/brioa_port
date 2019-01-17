@@ -12,7 +12,7 @@ class WebcamDownloader:
         self.webcam_url = webcam_url
         self.output_dir_path = output_dir_path.absolute()
 
-    def download_webcam_image(self) -> datetime:
+    def download_webcam_image(self) -> Path:
         try:
             return save_latest_file_from_url(self.webcam_url, self.output_dir_path)
         except (URLError, HTTPError, ContentTooShortError, FileHasInvalidLastModifiedDateException, FileExistsError):

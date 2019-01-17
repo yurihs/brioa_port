@@ -26,8 +26,8 @@ from brioa_port.exceptions import InvalidWebcamImageException
 
 def download(downloader):
     try:
-        image_date = downloader.download_webcam_image()
-        print(image_date)
+        image_path = downloader.download_webcam_image()
+        print("Downloaded " + image_path.stem)
     except InvalidWebcamImageException:
         print("Got an invalid image. Continuing.")
 
