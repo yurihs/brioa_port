@@ -25,7 +25,7 @@ from brioa_port.webcam_downloader import WebcamDownloader
 from brioa_port.exceptions import InvalidWebcamImageException
 
 
-def download(downloader):
+def download(downloader: WebcamDownloader) -> None:
     try:
         image_path = downloader.download_webcam_image()
         print("Downloaded " + image_path.stem)
@@ -33,7 +33,7 @@ def download(downloader):
         print("Warning: invalid image. Continuing.")
 
 
-def start_scheduler_thread(scheduler, interval=1):
+def start_scheduler_thread(scheduler: schedule.Scheduler, interval: int = 1) -> threading.Event:
     """Continuously run, while executing pending jobs at each elapsed
     time interval.
     @return cease_continuous_run: threading.Event which can be set to
@@ -48,7 +48,7 @@ def start_scheduler_thread(scheduler, interval=1):
 
     class ScheduleThread(threading.Thread):
         @classmethod
-        def run(cls):
+        def run(cls) -> None:
             while not cease_continuous_run.is_set():
                 scheduler.run_pending()
                 time.sleep(interval)
@@ -58,7 +58,7 @@ def start_scheduler_thread(scheduler, interval=1):
     return cease_continuous_run
 
 
-def main():
+def main() -> None:
     arguments = docopt(__doc__)
 
     webcam_url = 'http://www.portoitapoa.com.br/images/camera/camera.jpeg'
