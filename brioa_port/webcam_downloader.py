@@ -15,5 +15,5 @@ class WebcamDownloader:
     def download_webcam_image(self) -> datetime:
         try:
             return save_latest_file_from_url(self.webcam_url, self.output_dir_path)
-        except (URLError, HTTPError, ContentTooShortError, FileHasInvalidLastModifiedDateException):
+        except (URLError, HTTPError, ContentTooShortError, FileHasInvalidLastModifiedDateException, FileExistsError):
             raise InvalidWebcamImageException()
