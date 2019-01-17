@@ -29,7 +29,7 @@ def download(downloader):
         image_path = downloader.download_webcam_image()
         print("Downloaded " + image_path.stem)
     except InvalidWebcamImageException:
-        print("Got an invalid image. Continuing.")
+        print("Warning: invalid image. Continuing.")
 
 
 def main():
