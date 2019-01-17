@@ -16,6 +16,7 @@ import schedule
 import time
 import os
 import errno
+import threading
 
 from docopt import docopt
 from pathlib import Path
@@ -30,6 +31,31 @@ def download(downloader):
         print("Downloaded " + image_path.stem)
     except InvalidWebcamImageException:
         print("Warning: invalid image. Continuing.")
+
+
+def start_scheduler_thread(scheduler, interval=1):
+    """Continuously run, while executing pending jobs at each elapsed
+    time interval.
+    @return cease_continuous_run: threading.Event which can be set to
+    cease continuous run.
+    Please note that it is *intended behavior that run_continuously()
+    does not run missed jobs*. For example, if you've registered a job
+    that should run every minute and you set a continuous run interval
+    of one hour then your job won't be run 60 times at each interval but
+    only once.
+    """
+    cease_continuous_run = threading.Event()
+
+    class ScheduleThread(threading.Thread):
+        @classmethod
+        def run(cls):
+            while not cease_continuous_run.is_set():
+                scheduler.run_pending()
+                time.sleep(interval)
+
+    continuous_thread = ScheduleThread()
+    continuous_thread.start()
+    return cease_continuous_run
 
 
 def main():
@@ -60,11 +86,9 @@ def main():
         webcam_url,
         output_dir_path
     )
-    schedule.every(period).seconds.do(lambda: download(downloader))
 
-    while 1:
-        schedule.run_pending()
-        time.sleep(1)
+    schedule.every(period).seconds.do(lambda: download(downloader))
+    schedule_thread = start_scheduler_thread(schedule.default_scheduler)
 
 
 if __name__ == '__main__':
