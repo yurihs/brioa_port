@@ -62,7 +62,8 @@ class LogKeeper:
 
         return pd.read_sql((
             "select\n"
-            "   Berço, Navio, Viagem, ifnull(ETA, ATA) as TA, ifnull(ATB, ETB) as TB, ifnull(ATS, ETS) as TS\n"
+            "   Berço, Navio, Viagem, ifnull(ETA, ATA) as TA, ifnull(ATB, ETB) as TB, ifnull(ATS, ETS) as TS,\n"
+            "   ATA is NULL as TA_is_predicted, ATB is NULL as TB_is_predicted, ATS is NULL as TS_is_predicted\n"
             "from\n"
             f"   {self.LOGS_TABLE}\n"
             "where\n"

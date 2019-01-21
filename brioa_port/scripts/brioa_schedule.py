@@ -38,17 +38,28 @@ def determine_entry_status(entry: pd.Series) -> str:
 
     human_delta = make_delta_human_readable
 
+    prefix = ''
+    unverified_prefix = '[UNVERIFIED] '
+
     if yet_to_arrive:
-        return f'Arrives {human_delta(now, entry["TA"])}'
+        if entry['TA_is_predicted']:
+            prefix = unverified_prefix
+        return prefix + f'Arrives {human_delta(now, entry["TA"])}'
 
     if yet_to_berth:
-        return f'Arrived, berths at {berco_desc} {human_delta(now, entry["TB"])}'
+        if entry['TA_is_predicted']:
+            prefix = unverified_prefix
+        return prefix + f'Arrived, berths at {berco_desc} {human_delta(now, entry["TB"])}'
 
     if yet_to_sail:
-        return f'Berthed at {berco_desc}, sails {human_delta(now, entry["TS"])}'
+        if entry['TB_is_predicted']:
+            prefix = unverified_prefix
+        return prefix + f'Berthed at {berco_desc}, sails {human_delta(now, entry["TS"])}'
 
     if has_sailed:
-        return f'Sailed {human_delta(now, entry["TS"])}'
+        if entry['TS_is_predicted']:
+            prefix = unverified_prefix
+        return prefix + f'Sailed {human_delta(now, entry["TS"])}'
 
     return 'Unknown'
 
