@@ -28,6 +28,9 @@ class LogKeeper:
                 no_changes = entry.equals(existing_entry.drop('date_retrieved'))
                 if no_changes:
                     return False
+                existing_date_retrieved = existing_entry['date_retrieved'].to_pydatetime()
+                if existing_date_retrieved >= date_retrieved:
+                    return False
             return True
 
         if self.has_entries():

@@ -3,8 +3,14 @@
 
 Usage:
     brioa_programacao.py update <database_path>
+    brioa_programacao.py update_from_file <file_path> <database_path> [--retrieved-at <date_retrieved>]
     brioa_programacao.py current <database_path>
     brioa_programacao.py trip <trip_name> <database_path>
+
+Options:
+    --retrieved-at <date_retrieved> The date/time that the information in the file is from.
+                                    ISO 8601 Format: 2000-01-01 00:00:00
+                                    By default, it's taken from the filename (unix timestamp, local time).
 
 """
 
@@ -70,6 +76,37 @@ def cmd_update(args):
 
     new_data = parse_schedule_spreadsheet(spreadsheet_url)
     date_retrieved = datetime.now()
+
+    n_new_entries = logkeeper.write_entries(date_retrieved, new_data)
+    print(n_new_entries, 'new entry.' if n_new_entries == 1 else 'new entries.')
+
+
+
+def cmd_update_from_file(args):
+    logkeeper = LogKeeper(create_database_engine(args['<database_path>']))
+
+    spreadsheet_path = Path(args['<file_path>'])
+
+    new_data = parse_schedule_spreadsheet(str(spreadsheet_path))
+
+    try:
+        date_from_filename = datetime.fromtimestamp(int(spreadsheet_path.stem))
+    except (ValueError, OverflowError, OSError):
+        date_from_filename = None
+
+    if args['--retrieved-at'] is not None:
+        date_from_args = datetime.strptime(args['--retrieved-at'], '%Y-%m-%d %H:%M:%S')
+    else:
+        date_from_args = None
+
+    if date_from_args is None and date_from_filename is None:
+        print((
+            'Unable to infer file retrieval date from filename.\n'
+            'Use a Unix timestamp as the filename, or specify the --retrieved-at option.'
+        ))
+        return
+
+    date_retrieved = date_from_args if date_from_args is not None else date_from_filename
 
     n_new_entries = logkeeper.write_entries(date_retrieved, new_data)
     print(n_new_entries, 'new entry.' if n_new_entries == 1 else 'new entries.')
@@ -145,6 +182,8 @@ def main() -> None:
 
     if args['update']:
         cmd_update(args)
+    if args['update_from_file']:
+        cmd_update_from_file(args)
     elif args['current']:
         cmd_current(args)
     elif args['trip']:
