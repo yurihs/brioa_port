@@ -2,21 +2,25 @@
 """BRIOA Schedule Downloader
 
 Usage:
-    brioa_programacao.py update <database_path>
-    brioa_programacao.py update_from_file <file_path> <database_path> [--retrieved-at <date_retrieved>]
+    brioa_programacao.py update online <database_path> [--period <seconds>]
+    brioa_programacao.py update from_file <file_path> <database_path> [--retrieved-at <date_retrieved>]
     brioa_programacao.py current <database_path>
     brioa_programacao.py trip <trip_name> <database_path>
 
 Options:
+    --period <seconds>  To constantly update the database, set the update frequency with this option.
     --retrieved-at <date_retrieved> The date/time that the information in the file is from.
                                     ISO 8601 Format: 2000-01-01 00:00:00
                                     By default, it's taken from the filename (unix timestamp, local time).
 
 """
 
+import functools
+import time
 import sys
 import pandas as pd
 import numpy as np
+import schedule
 
 from docopt import docopt
 from pathlib import Path
@@ -70,16 +74,39 @@ def determine_entry_status(entry: pd.Series) -> str:
     return 'Unknown'
 
 
-def cmd_update(args):
+
+def update_once(database_path):
     spreadsheet_url = 'http://www.portoitapoa.com.br/excel/'
-    logkeeper = LogKeeper(create_database_engine(args['<database_path>']))
+    logkeeper = LogKeeper(create_database_engine(database_path))
 
     new_data = parse_schedule_spreadsheet(spreadsheet_url)
     date_retrieved = datetime.now()
 
     n_new_entries = logkeeper.write_entries(date_retrieved, new_data)
+    print(date_retrieved.strftime('%Y-%m-%d %H:%M:%S'), end=': ')
     print(n_new_entries, 'new entry.' if n_new_entries == 1 else 'new entries.')
 
+
+def cmd_update_online(args):
+    if args['--period'] is None:
+        update_once(args['<database_path>'])
+        return
+
+    period_str = args['--period']
+    try:
+        period = int(period_str)
+    except ValueError:
+        print("Error: Invalid period.")
+        return
+
+    if period < 0:
+        print("Error: Invalid period.")
+        return
+
+    schedule.every(period).seconds.do(functools.partial(update_once, args['<database_path>']))
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
 
 def cmd_update_from_file(args):
@@ -180,9 +207,9 @@ def cmd_trip(args):
 def main() -> None:
     args = docopt(__doc__)
 
-    if args['update']:
-        cmd_update(args)
-    if args['update_from_file']:
+    if args['update'] and args['online']:
+        cmd_update_online(args)
+    if args['update'] and args['from_file']:
         cmd_update_from_file(args)
     elif args['current']:
         cmd_current(args)
