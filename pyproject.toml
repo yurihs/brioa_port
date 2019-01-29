@@ -13,6 +13,9 @@ sqlalchemy = "^1.2"
 pandas = "^0.23.4"
 numpy = "^1.16"
 xlrd_no_sector_corruption_check = "^1.2"
+Pillow = "^5.4"
+Babel = "^2.6"
+tqdm = "^4.30"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
@@ -22,6 +25,7 @@ pytest-mock = "^1.10"
 [tool.poetry.scripts]
 brioa_webcam_downloader = "brioa_port.scripts.brioa_webcam_downloader:main"
 brioa_schedule = "brioa_port.scripts.brioa_schedule:main"
+brioa_timelapse_creator = "brioa_port.scripts.brioa_timelapse_creator:main"
 
 [build-system]
 requires = ["poetry>=0.12"]
