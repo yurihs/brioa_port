@@ -2,6 +2,9 @@
 
 Tools for interpreting data relating to the seaport in [Itapoá, Brazil](http://www.portoitapoa.com.br/) (UN/LOCODE: BR IOA).
 
+![Timelapse example](assets/timelapse_example.gif)
+
+
 ## The tools
 
 **Webcam downloader:** The port administration provides a public [image feed](http://www.portoitapoa.com.br/camera/) from a webcam watching over the berthing areas. This tool makes it easy to download these pictures on a fixed interval, preserving the creation date in the filenames.
