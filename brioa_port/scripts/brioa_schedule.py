@@ -17,9 +17,7 @@ Options:
 
 import functools
 import time
-import sys
 import pandas as pd
-import numpy as np
 import schedule
 
 from docopt import docopt
@@ -28,8 +26,8 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from brioa_port.util.datetime import make_delta_human_readable
-from brioa_port.util.database import create_database_engine, DATABASE_DATETIME_FORMAT
-from brioa_port.schedule_parser import parse_schedule_spreadsheet, SCHEDULE_DATE_COLUMNS
+from brioa_port.util.database import create_database_engine
+from brioa_port.schedule_parser import parse_schedule_spreadsheet
 from brioa_port.log_keeper import LogKeeper
 
 
@@ -72,7 +70,6 @@ def determine_entry_status(entry: pd.Series) -> str:
         return prefix + f'Sailed {human_delta(now, entry["TS"])}'
 
     return 'Unknown'
-
 
 
 def update_once(database_path):
@@ -170,7 +167,6 @@ def cmd_trip(args):
         print("Trip not found.")
         return
 
-
     def desc_event(action, date_expected, date_actual):
         date_expected = date_expected.to_pydatetime()
         date_actual = date_actual.to_pydatetime()
@@ -204,6 +200,7 @@ def cmd_trip(args):
     else:
         print(desc_event('Sail', entry['ETS'], entry['ATS']), 'at', entry['ETS'])
 
+
 def main() -> None:
     args = docopt(__doc__)
 
@@ -215,6 +212,7 @@ def main() -> None:
         cmd_current(args)
     elif args['trip']:
         cmd_trip(args)
+
 
 if __name__ == '__main__':
     main()

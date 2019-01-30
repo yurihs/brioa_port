@@ -10,8 +10,6 @@ from brioa_port.log_keeper import LogKeeper
 from brioa_port.util.entry import get_ship_status, get_ship_berth_number, \
                                   ShipStatus
 
-BoxTuple = Tuple[int, int, int, int]
-
 
 class TimelapseFrameProcessor:
     """

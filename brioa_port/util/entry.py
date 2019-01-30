@@ -14,6 +14,17 @@ class ShipStatus(Enum):
 
 
 def get_ship_status(ship_entry: pd.Series, date: datetime) -> ShipStatus:
+    """
+    Determines the status of a ship from the dates in it's log entry,
+    and a given date to compare, e.g. 'now'.
+
+    Args:
+        ship_entry: The ship entry, with the arrival, berthing, and sailing dates.
+        date: What to compare the log dates with.
+
+    Returns:
+        The ShipStatus.
+    """
     yet_to_arrive = ship_entry['TA'] >= date
     yet_to_berth = ship_entry['TB'] >= date
     yet_to_sail = ship_entry['TS'] >= date
@@ -32,6 +43,15 @@ def get_ship_status(ship_entry: pd.Series, date: datetime) -> ShipStatus:
 
 
 def get_ship_berth_number(ship_entry: pd.Series) -> Optional[int]:
+    """
+    Converts the raw ship entry info into an nice number.
+
+    Args:
+        ship_entry: The log entry with the berth info.
+
+    Returns:
+        The berth number, or None if there isn't one.
+    """
     if not pd.isnull(ship_entry['Berço']):
         return int(ship_entry['Berço'])
     return None
