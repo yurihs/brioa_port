@@ -4,10 +4,13 @@ Periodically downloads images from the Port of Itapoa webcam to a
 specified output directory. The filenames are the UNIX timestamp
 representing the time that the photo was taken.
 
+The output directory will be created if it doesn't exist.
+
 Usage:
-    brioa_webcam_downloader.py <output_dir> [--period <seconds>]
+    brioa_webcam_downloader.py <output_dir> [--period <seconds>] [--verbose | --quiet]
 
 Options:
+    -v, --verbose   Show more information messages
     --period <seconds>   How often to download an image [default: 20].
 
 """
@@ -16,46 +19,42 @@ import schedule
 import time
 import os
 import errno
-import threading
+import sys
+import logging
 
 from docopt import docopt
 from pathlib import Path
 
-from brioa_port.webcam_downloader import WebcamDownloader
+from brioa_port.webcam_downloader import download_webcam_image
 from brioa_port.exceptions import InvalidWebcamImageException
 
 
-def download(downloader: WebcamDownloader) -> None:
-    try:
-        image_path = downloader.download_webcam_image()
-        print("Downloaded " + image_path.stem)
-    except InvalidWebcamImageException:
-        print("Warning: invalid image. Continuing.")
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
 
 
-def start_scheduler_thread(scheduler: schedule.Scheduler, interval: int = 1) -> threading.Event:
-    """Continuously run, while executing pending jobs at each elapsed
-    time interval.
-    @return cease_continuous_run: threading.Event which can be set to
-    cease continuous run.
-    Please note that it is *intended behavior that run_continuously()
-    does not run missed jobs*. For example, if you've registered a job
-    that should run every minute and you set a continuous run interval
-    of one hour then your job won't be run 60 times at each interval but
-    only once.
+def safe_download(webcam_url: str, output_dir: Path) -> None:
     """
-    cease_continuous_run = threading.Event()
+    Task for the scheduler. Downloads an image and ignores exceptions.
+    """
+    try:
+        image_path = download_webcam_image(webcam_url, output_dir)
+        logger.info("Downloaded " + image_path.stem)
+    except InvalidWebcamImageException:
+        logger.warning("Got invalid image. Continuing.")
 
-    class ScheduleThread(threading.Thread):
-        @classmethod
-        def run(cls) -> None:
-            while not cease_continuous_run.is_set():
-                scheduler.run_pending()
-                time.sleep(interval)
 
-    continuous_thread = ScheduleThread()
-    continuous_thread.start()
-    return cease_continuous_run
+def parse_period_arg(arg: str) -> int:
+    """
+    Makes sure that a the period argument is a valid postive integer.
+    """
+    try:
+        period = int(arg)
+    except ValueError:
+        raise ValueError("Period must be an integer")
+    if period < 0:
+        raise ValueError("Period cannot be negative")
+    return period
 
 
 def main() -> None:
@@ -64,31 +63,32 @@ def main() -> None:
     webcam_url = 'http://www.portoitapoa.com.br/images/camera/camera.jpeg'
     output_dir_path = Path(arguments['<output_dir>'])
 
-    period_str = arguments['--period']
+    # Handle logging options
+    if arguments['--verbose']:
+        logger.setLevel(logging.DEBUG)
+    if arguments['--quiet']:
+        logging.disable(logging.CRITICAL)
+
+    # Handle period option
     try:
-        period = int(period_str)
-    except ValueError:
-        print("Error: Invalid period.")
-        return
+        period = parse_period_arg(arguments['--period'])
+    except ValueError as e:
+        logger.critical("Error: %s", e)
+        sys.exit(1)
 
-    if period < 0:
-        print("Error: Invalid period.")
-        return
-
+    # Handle output dir argument, creates it if necessary
     try:
         os.makedirs(output_dir_path)
     except OSError as e:
         if e.errno != errno.EEXIST:
-            print("Error: Unable to create output directory.")
-            return
+            logger.critical("Error: Unable to create output directory.")
+            sys.exit(1)
 
-    downloader = WebcamDownloader(
-        webcam_url,
-        output_dir_path
-    )
-
-    schedule.every(period).seconds.do(lambda: download(downloader))
-    schedule_thread = start_scheduler_thread(schedule.default_scheduler)
+    # Download in a loop!
+    schedule.every(period).seconds.do(lambda: safe_download(webcam_url, output_dir_path))
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
 
 if __name__ == '__main__':
