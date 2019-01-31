@@ -24,6 +24,7 @@ from docopt import docopt
 from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from typing import Dict, Optional
 
 from brioa_port.util.datetime import make_delta_human_readable
 from brioa_port.util.database import create_database_engine
@@ -72,7 +73,7 @@ def determine_entry_status(entry: pd.Series) -> str:
     return 'Unknown'
 
 
-def update_once(database_path):
+def update_once(database_path: str) -> None:
     spreadsheet_url = 'http://www.portoitapoa.com.br/excel/'
     logkeeper = LogKeeper(create_database_engine(database_path))
 
@@ -84,7 +85,7 @@ def update_once(database_path):
     print(n_new_entries, 'new entry.' if n_new_entries == 1 else 'new entries.')
 
 
-def cmd_update_online(args):
+def cmd_update_online(args: Dict[str, str]) -> None:
     if args['--period'] is None:
         update_once(args['<database_path>'])
         return
@@ -106,7 +107,7 @@ def cmd_update_online(args):
         time.sleep(1)
 
 
-def cmd_update_from_file(args):
+def cmd_update_from_file(args: Dict[str, str]) -> None:
     logkeeper = LogKeeper(create_database_engine(args['<database_path>']))
 
     spreadsheet_path = Path(args['<file_path>'])
@@ -114,7 +115,7 @@ def cmd_update_from_file(args):
     new_data = parse_schedule_spreadsheet(str(spreadsheet_path))
 
     try:
-        date_from_filename = datetime.fromtimestamp(int(spreadsheet_path.stem))
+        date_from_filename: Optional[datetime] = datetime.fromtimestamp(int(spreadsheet_path.stem))
     except (ValueError, OverflowError, OSError):
         date_from_filename = None
 
@@ -136,7 +137,7 @@ def cmd_update_from_file(args):
     print(n_new_entries, 'new entry.' if n_new_entries == 1 else 'new entries.')
 
 
-def cmd_current(args):
+def cmd_current(args: Dict[str, str]) -> None:
     logkeeper = LogKeeper(create_database_engine(args['<database_path>']))
 
     if not logkeeper.has_entries():
@@ -156,7 +157,7 @@ def cmd_current(args):
         print(f'{entry["Navio"]} ({entry["Viagem"]}): {determine_entry_status(entry)}')
 
 
-def cmd_trip(args):
+def cmd_trip(args: Dict[str, str]) -> None:
     logkeeper = LogKeeper(create_database_engine(args['<database_path>']))
     if not logkeeper.has_entries():
         print("No entries found.")
@@ -167,7 +168,7 @@ def cmd_trip(args):
         print("Trip not found.")
         return
 
-    def desc_event(action, date_expected, date_actual):
+    def desc_event(action: str, date_expected: pd.Timestamp, date_actual: pd.Timestamp) -> str:
         date_expected = date_expected.to_pydatetime()
         date_actual = date_actual.to_pydatetime()
 
