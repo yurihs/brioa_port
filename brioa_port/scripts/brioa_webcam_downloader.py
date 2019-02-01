@@ -27,6 +27,7 @@ from pathlib import Path
 
 from brioa_port.webcam_downloader import download_webcam_image
 from brioa_port.exceptions import InvalidWebcamImageException
+from brioa_port.util.args import parse_period_arg
 
 
 logging.basicConfig(level=logging.WARNING)
@@ -42,19 +43,6 @@ def safe_download(webcam_url: str, output_dir: Path) -> None:
         logger.info("Downloaded " + image_path.stem)
     except InvalidWebcamImageException:
         logger.warning("Got invalid image. Continuing.")
-
-
-def parse_period_arg(arg: str) -> int:
-    """
-    Makes sure that a the period argument is a valid postive integer.
-    """
-    try:
-        period = int(arg)
-    except ValueError:
-        raise ValueError("Period must be an integer")
-    if period < 0:
-        raise ValueError("Period cannot be negative")
-    return period
 
 
 def main() -> None:
