@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "brioa_port"
 version = "0.1.0"
-description = ""
+description = "Tools for interpreting data relating to the seaport in Itapoá, Brazil."
 authors = ["yurihs"]
 
 [tool.poetry.dependencies]
