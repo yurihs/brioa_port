@@ -3,6 +3,7 @@ name = "brioa_port"
 version = "0.1.0"
 description = "Tools for interpreting data relating to the seaport in Itapoá, Brazil."
 authors = ["yurihs"]
+homepage = "https://github.com/yurihs/brioa_port"
 
 [tool.poetry.dependencies]
 python = "^3.7"
