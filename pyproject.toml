@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Tools for interpreting data relating to the seaport in Itapoá, Brazil."
 authors = ["yurihs <yurisalvador@hotmail.com>"]
 homepage = "https://github.com/yurihs/brioa_port"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7"
