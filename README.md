@@ -2,7 +2,7 @@
 
 Tools for interpreting data relating to the seaport in [Itapoá, Brazil](http://www.portoitapoa.com.br/) (UN/LOCODE: BR IOA).
 
-![Timelapse example](assets/timelapse_example.gif)
+![Timelapse example](https://raw.githubusercontent.com/yurihs/brioa_port/master/assets/timelapse_example.gif)
 
 
 ## The tools
